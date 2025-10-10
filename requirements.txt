@@ -1,0 +1,5 @@
+streamlit
+pandas
+pyAesCrypt
+fpdf2
+openpyxl
