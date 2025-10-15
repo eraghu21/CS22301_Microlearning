@@ -4,7 +4,7 @@ import pyAesCrypt
 import os
 import io
 import base64
-from datetime import datetime, timedelta
+from datetime import datetime
 from fpdf import FPDF
 
 # =================== CONFIG ===================
@@ -23,6 +23,7 @@ except Exception as e:
 VIDEO_URL = st.secrets.get("video", {}).get("url", "https://www.youtube.com/watch?v=eLxQMPkDmAo")
 VIDEO_DURATION = int(st.secrets.get("video", {}).get("duration", 600))  # seconds
 SUBJECT = st.secrets.get("video", {}).get("subject", "CS22301 Microlearning")
+CERT_IMAGE = st.secrets.get("certificate", {}).get("image_path", None)  # certificate background image path
 
 # =================== DECRYPT & LOAD STUDENT FILE ===================
 def load_student_file():
@@ -63,8 +64,15 @@ def create_certificate(name, reg_no, subject):
     pdf = FPDF("L", "mm", "A4")
     pdf.add_page()
     pdf.set_auto_page_break(False)
+
+    # Add background image if provided
+    if CERT_IMAGE and os.path.exists(CERT_IMAGE):
+        pdf.image(CERT_IMAGE, x=0, y=0, w=297, h=210)  # A4 landscape
+
+    # Overlay text
     pdf.set_font("Arial", "B", 30)
-    pdf.cell(0, 40, "Certificate of Completion", align="C", ln=1)
+    pdf.set_y(40)
+    pdf.cell(0, 10, "Certificate of Completion", align="C", ln=1)
 
     pdf.set_font("Arial", "", 18)
     pdf.cell(0, 10, "This certifies that", align="C", ln=1)
@@ -120,19 +128,17 @@ if st.button("Login") and reg_no:
         st.session_state.certificate_ready = False
         st.success(f"Welcome, {student.get('Name', 'Student')}!")
 
-# ----------------- VIDEO + TIMER -----------------
+# ----------------- VIDEO + TIMER + BUTTON -----------------
 if st.session_state.get("timer_started", False):
     student = st.session_state.student
     name = student.get("Name", "Student")
     reg = student.get("Reg_No", reg_no)
 
     st.subheader(f"Subject: {SUBJECT}")
-    embed_url = VIDEO_URL.replace("watch?v=", "embed/")
-    st.video(embed_url)
 
+    # Timer on top
     elapsed = (datetime.now() - st.session_state.login_time).total_seconds()
     remaining = VIDEO_DURATION - elapsed
-
     if remaining > 0:
         st.info(f"⏱ Time remaining: {int(remaining)} seconds. Please keep watching...")
         st.progress(int((elapsed / VIDEO_DURATION) * 100))
@@ -140,14 +146,28 @@ if st.session_state.get("timer_started", False):
         st.session_state.video_done = True
         st.success("✅ Video time completed!")
 
-# ----------------- WATCHED BUTTON + CERTIFICATE -----------------
-if st.session_state.get("video_done", False) and not st.session_state.get("certificate_ready", False):
-    if st.button("🎥 I have watched the video"):
-        path = create_certificate(st.session_state.student.get("Name", "Student"), reg, SUBJECT)
-        st.session_state.certificate_path = path
-        st.session_state.certificate_ready = True
-        st.success("✅ Certificate generated successfully!")
+    # Video embed
+    embed_url = VIDEO_URL.replace("watch?v=", "embed/")
+    st.video(embed_url)
 
-# ----------------- CERTIFICATE DOWNLOAD -----------------
-if st.session_state.get("certificate_ready", False):
-    st.markdown(get_pdf_download_link(st.session_state.certificate_path), unsafe_allow_html=True)
+    # Button below video
+    if st.session_state.get("video_done", False):
+        if not st.session_state.get("certificate_ready", False):
+            if st.button("🎥 I have watched the video"):
+                path = create_certificate(student.get("Name", "Student"), reg, SUBJECT)
+                st.session_state.certificate_path = path
+                st.session_state.certificate_ready = True
+                st.success("✅ Certificate generated successfully!")
+
+        # Download link below button
+        if st.session_state.get("certificate_ready", False):
+            st.markdown(get_pdf_download_link(st.session_state.certificate_path), unsafe_allow_html=True)
+
+# ----------------- ADMIN -----------------
+st.markdown("---")
+if st.checkbox("Admin Login"):
+    pw = st.text_input("Password", type="password")
+    if pw == ADMIN_PASSWORD:
+        st.success("Admin access granted.")
+        if st.button("Reload Student File"):
+            st.session_state.df = load_student_file()
