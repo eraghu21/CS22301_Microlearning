@@ -21,7 +21,7 @@ except Exception as e:
     st.stop()
 
 VIDEO_URL = st.secrets.get("video", {}).get("url", "https://www.youtube.com/watch?v=eLxQMPkDmAo")
-VIDEO_DURATION = int(st.secrets.get("video", {}).get("duration", 600))  # seconds
+VIDEO_DURATION = int(st.secrets.get("video", {}).get("duration", 15))  # seconds
 SUBJECT = st.secrets.get("video", {}).get("subject", "CS22301 Microlearning")
 
 # =================== CERTIFICATE BACKGROUND (BASE64) ===================
