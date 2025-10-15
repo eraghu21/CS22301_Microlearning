@@ -94,7 +94,7 @@ def create_certificate(name, reg_no, subject):
    
     pdf.ln(5)
     pdf.set_font("Helvetica", '', 15)
-    pdf.cell(0, 5, f"{regno}- {year} {dept} - {section}", ln=True, align="C")
+    pdf.cell(0, 5, f"{regno}- "II CSE - A", ln=True, align="C")
 
     pdf.ln(63)
     pdf.set_font("Helvetica", '', 16)
@@ -114,7 +114,7 @@ def get_pdf_download_link(path):
 
 # =================== MAIN APP ===================
 st.set_page_config(page_title="CS22301 Microlearning", layout="centered")
-st.title("🎓 CS22301 Microlearning Portal")
+st.title("🎓 Database Management Systems")
 
 # Load student file once
 if "df" not in st.session_state:
