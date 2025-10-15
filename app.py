@@ -94,7 +94,8 @@ def create_certificate(name, reg_no, subject):
    
     pdf.ln(5)
     pdf.set_font("Helvetica", '', 15)
-    pdf.cell(0, 5, f"{regno}- "II CSE - A", ln=True, align="C")
+    pdf.cell(0, 5, f"{regno} - II CSE - A", ln=True, align="C")
+
 
     pdf.ln(63)
     pdf.set_font("Helvetica", '', 16)
