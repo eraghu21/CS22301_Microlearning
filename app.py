@@ -88,7 +88,7 @@ def load_students():
             f.seek(0, 2)
             file_len = f.tell()
             f.seek(0)
-            pyAesCrypt.decryptStream(f, decrypted, AES_PASSWORD, BUFFER_SIZE, file_len)
+           pyAesCrypt.decryptStream(f, decrypted, AES_PASSWORD, BUFFER_SIZE)
         decrypted.seek(0)
         df = pd.read_excel(decrypted)
         df["RegNo"] = df["RegNo"].astype(str).str.strip()
