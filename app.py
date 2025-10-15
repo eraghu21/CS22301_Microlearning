@@ -14,7 +14,7 @@ BUFFER_SIZE = 64 * 1024
 CERT_DIR = "certificates"
 os.makedirs(CERT_DIR, exist_ok=True)
 
-VIDEO_URL = "https://youtu.be/eLxQMPkDmAo?si=CQj3bObQdYl9hYVU"  
+VIDEO_URL = "https://www.youtube.com/watch?v=eLxQMPkDmAo"  
 VIDEO_DURATION = 900  # 15 minutes
 
 AES_FILE = st.secrets["aes"]["file"]
