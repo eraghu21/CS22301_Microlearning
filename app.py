@@ -88,19 +88,17 @@ def create_certificate(name, reg_no, subject):
 
     # ----------------- Overlay text -----------------
     pdf.set_font("Arial", "B", 30)
-    pdf.ln(80)
-
-    pdf.set_font("Arial", "B", 26)
-    pdf.cell(0, 15, name, align="C", ln=1)
-
-    pdf.set_font("Arial", "", 16)
-    pdf.cell(0, 10, f"Reg. No: {reg_no}", align="C", ln=1)
+    pdf.ln(91)
+    pdf.set_font("Helvetica", 'B', 29)
+    pdf.cell(0, 5, name, ln=True, align="C")
+   
     pdf.ln(5)
-    pdf.multi_cell(0, 10,
-        
-        f"on {datetime.now().strftime('%d-%m-%Y')}.",
-        align="C")
-    pdf.ln(15)
+    pdf.set_font("Helvetica", '', 15)
+    pdf.cell(0, 5, f"{regno}- {year} {dept} - {section}", ln=True, align="C")
+
+    pdf.ln(63)
+    pdf.set_font("Helvetica", '', 16)
+    pdf.cell(0, 10, f"Completed on: {timestamp}", ln=True, align="C")
     
 
     filename = f"{reg_no}_{subject.replace(' ', '_')}.pdf"
