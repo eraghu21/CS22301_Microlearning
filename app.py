@@ -141,7 +141,7 @@ if st.session_state.get("timer_started", False):
     name = student.get("Name", "Student")
     reg = student.get("Reg_No", reg_no)
 
-    st.subheader(f"Subject: {SUBJECT}")
+    st.subheader(f"Topic: {SUBJECT}")
 
     # Timer on top
     elapsed = (datetime.now() - st.session_state.login_time).total_seconds()
