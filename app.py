@@ -1,10 +1,10 @@
-# app.py – Auto timer + certificate after video
 import streamlit as st
 import pandas as pd
 import pyAesCrypt
 import os
+import io
 import base64
-from datetime import datetime
+from datetime import datetime, timedelta
 from fpdf import FPDF
 
 # =================== CONFIG ===================
@@ -31,15 +31,17 @@ def load_student_file():
             st.error(f"Encrypted file not found: {AES_FILE}")
             return None
 
-        decrypted_file = "Students_List.xlsx"
-        with open(AES_FILE, "rb") as f_in, open(decrypted_file, "wb") as f_out:
-            pyAesCrypt.decryptStream(f_in, f_out, AES_PASSWORD, BUFFER_SIZE)
+        decrypted_bytes = io.BytesIO()
+        with open(AES_FILE, "rb") as f_in:
+            pyAesCrypt.decryptStream(f_in, decrypted_bytes, AES_PASSWORD, BUFFER_SIZE)
+        
+        decrypted_bytes.seek(0)
+        df = pd.read_excel(decrypted_bytes)
 
-        if os.path.getsize(decrypted_file) == 0:
+        if df.empty:
             st.error("Decrypted file is empty. Check AES password.")
             return None
 
-        df = pd.read_excel(decrypted_file)
         st.success("✅ Student list loaded successfully.")
         return df
     except Exception as e:
@@ -96,6 +98,7 @@ def get_pdf_download_link(path):
 st.set_page_config(page_title="CS22301 Microlearning", layout="centered")
 st.title("🎓 CS22301 Microlearning Portal")
 
+# Load student file once
 if "df" not in st.session_state:
     st.session_state.df = load_student_file()
 
@@ -103,10 +106,9 @@ df = st.session_state.df
 if df is None:
     st.stop()
 
-st.markdown("---")
+# ----------------- LOGIN -----------------
 reg_no = st.text_input("Enter your Registration Number")
-
-if st.button("Login"):
+if st.button("Login") and reg_no:
     student = find_student(df, reg_no)
     if student is None:
         st.error("Registration number not found in the student list.")
@@ -118,7 +120,7 @@ if st.button("Login"):
         st.session_state.certificate_ready = False
         st.success(f"Welcome, {student.get('Name', 'Student')}!")
 
-# =================== VIDEO + TIMER LOGIC ===================
+# ----------------- VIDEO + TIMER -----------------
 if st.session_state.get("timer_started", False):
     student = st.session_state.student
     name = student.get("Name", "Student")
@@ -135,26 +137,17 @@ if st.session_state.get("timer_started", False):
         st.info(f"⏱ Time remaining: {int(remaining)} seconds. Please keep watching...")
         st.progress(int((elapsed / VIDEO_DURATION) * 100))
     else:
-        st.success("✅ Video time completed!")
         st.session_state.video_done = True
+        st.success("✅ Video time completed!")
 
-# =================== WATCHED BUTTON ===================
+# ----------------- WATCHED BUTTON + CERTIFICATE -----------------
 if st.session_state.get("video_done", False) and not st.session_state.get("certificate_ready", False):
     if st.button("🎥 I have watched the video"):
-        path = create_certificate(st.session_state.student.get("Name", "Student"), reg_no, SUBJECT)
+        path = create_certificate(st.session_state.student.get("Name", "Student"), reg, SUBJECT)
         st.session_state.certificate_path = path
         st.session_state.certificate_ready = True
         st.success("✅ Certificate generated successfully!")
 
-# =================== CERTIFICATE DOWNLOAD ===================
+# ----------------- CERTIFICATE DOWNLOAD -----------------
 if st.session_state.get("certificate_ready", False):
     st.markdown(get_pdf_download_link(st.session_state.certificate_path), unsafe_allow_html=True)
-
-# =================== ADMIN (Optional) ===================
-st.markdown("---")
-if st.checkbox("Admin Login"):
-    pw = st.text_input("Password", type="password")
-    if pw == ADMIN_PASSWORD:
-        st.success("Admin access granted.")
-        if st.button("Reload Student File"):
-            st.session_state.df = load_student_file()
