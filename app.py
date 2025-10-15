@@ -190,4 +190,4 @@ if st.checkbox("Admin Login"):
     if pw == ADMIN_PASSWORD:
         st.success("Admin access granted.")
         if st.button("Reload Student File"):
-        st.session_state.df = load_student_file()
+           st.session_state.df = load_student_file()
