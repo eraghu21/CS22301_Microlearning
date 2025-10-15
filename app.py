@@ -96,14 +96,12 @@ def create_certificate(name, reg_no, subject):
     pdf.set_font("Helvetica", '', 15)
     pdf.cell(0, 5, f"{reg_no} - II CSE - A", ln=True, align="C")
 
-
-
     pdf.ln(63)
     pdf.set_font("Helvetica", '', 16)
     pdf.cell(0, 10, f"Completed on: {timestamp}", ln=True, align="C")
     
 
-    filename = f"{reg_no}_{subject.replace(' ', '_')}.pdf"
+    filename = f"{reg_no}_{name.replace(' ', '_')}.pdf"
     path = os.path.join(CERT_DIR, filename)
     pdf.output(path)
     return path
