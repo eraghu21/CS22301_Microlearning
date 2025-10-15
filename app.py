@@ -25,7 +25,7 @@ except Exception as e:
     st.stop()
 
 VIDEO_URL = st.secrets.get("video", {}).get("url", "https://www.youtube.com/watch?v=eLxQMPkDmAo")
-VIDEO_DURATION = int(st.secrets.get("video", {}).get("duration", 6))  # seconds
+VIDEO_DURATION = int(st.secrets.get("video", {}).get("duration", 600))  # seconds
 SUBJECT = st.secrets.get("video", {}).get("subject", "CS22301 Microlearning")
 
 # =================== CERTIFICATE BACKGROUND (BASE64) ===================
@@ -110,8 +110,8 @@ def get_pdf_download_link(path):
     return f'<a href="data:application/pdf;base64,{b64}" download="{name}">📥 Download Certificate</a>'
 
 # =================== MAIN APP ===================
-st.set_page_config(page_title="CS22301 Microlearning", layout="centered")
-st.title("🎓 Database Management Systems")
+st.set_page_config(page_title="", layout="centered")
+st.title("🎓 CS22301 Database Management System ")
 
 # Load student file once
 if "df" not in st.session_state:
