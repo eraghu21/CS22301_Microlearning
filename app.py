@@ -23,7 +23,7 @@ except Exception as e:
 VIDEO_URL = st.secrets.get("video", {}).get("url", "https://www.youtube.com/watch?v=eLxQMPkDmAo")
 VIDEO_DURATION = int(st.secrets.get("video", {}).get("duration", 600))  # seconds
 SUBJECT = st.secrets.get("video", {}).get("subject", "CS22301 Microlearning")
-CERT_IMAGE = st.secrets.get("certificate", {}).get("image_path", None)  # certificate background image path
+CERT_IMAGE = st.secrets.get("certificate", {}).get("image_path", None)  # optional certificate background image path
 
 # =================== DECRYPT & LOAD STUDENT FILE ===================
 def load_student_file():
@@ -128,7 +128,7 @@ if st.button("Login") and reg_no:
         st.session_state.certificate_ready = False
         st.success(f"Welcome, {student.get('Name', 'Student')}!")
 
-# ----------------- VIDEO + TIMER + BUTTON -----------------
+# ----------------- VIDEO + TIMER + WATCHED BUTTON -----------------
 if st.session_state.get("timer_started", False):
     student = st.session_state.student
     name = student.get("Name", "Student")
@@ -137,8 +137,12 @@ if st.session_state.get("timer_started", False):
     st.subheader(f"Subject: {SUBJECT}")
 
     # Timer on top
+    if "video_done" not in st.session_state:
+        st.session_state.video_done = False
+
     elapsed = (datetime.now() - st.session_state.login_time).total_seconds()
     remaining = VIDEO_DURATION - elapsed
+
     if remaining > 0:
         st.info(f"⏱ Time remaining: {int(remaining)} seconds. Please keep watching...")
         st.progress(int((elapsed / VIDEO_DURATION) * 100))
@@ -150,18 +154,22 @@ if st.session_state.get("timer_started", False):
     embed_url = VIDEO_URL.replace("watch?v=", "embed/")
     st.video(embed_url)
 
-    # Button below video
-    if st.session_state.get("video_done", False):
-        if not st.session_state.get("certificate_ready", False):
-            if st.button("🎥 I have watched the video"):
-                path = create_certificate(student.get("Name", "Student"), reg, SUBJECT)
-                st.session_state.certificate_path = path
-                st.session_state.certificate_ready = True
-                st.success("✅ Certificate generated successfully!")
+    # "I have watched the video" button always visible
+    if "certificate_ready" not in st.session_state:
+        st.session_state.certificate_ready = False
 
-        # Download link below button
-        if st.session_state.get("certificate_ready", False):
-            st.markdown(get_pdf_download_link(st.session_state.certificate_path), unsafe_allow_html=True)
+    if st.button("🎥 I have watched the video"):
+        if st.session_state.video_done:
+            path = create_certificate(student.get("Name", "Student"), reg, SUBJECT)
+            st.session_state.certificate_path = path
+            st.session_state.certificate_ready = True
+            st.success("✅ Certificate generated successfully!")
+        else:
+            st.warning(f"⏱ You need to finish watching the video before downloading the certificate. Remaining: {int(remaining)} sec")
+
+    # Download link below button
+    if st.session_state.certificate_ready:
+        st.markdown(get_pdf_download_link(st.session_state.certificate_path), unsafe_allow_html=True)
 
 # ----------------- ADMIN -----------------
 st.markdown("---")
