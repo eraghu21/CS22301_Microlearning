@@ -88,7 +88,7 @@ def create_certificate(name, reg_no, subject):
 
     # ----------------- Overlay text -----------------
     pdf.set_font("Arial", "B", 30)
-     pdf.ln(80)
+    pdf.ln(80)
 
     pdf.set_font("Arial", "B", 26)
     pdf.cell(0, 15, name, align="C", ln=1)
