@@ -89,10 +89,7 @@ def create_certificate(name, reg_no, subject):
     # ----------------- Overlay text -----------------
     pdf.set_font("Arial", "B", 30)
     pdf.set_y(40)
-    pdf.cell(0, 10, "Certificate of Completion", align="C", ln=1)
-
-    pdf.set_font("Arial", "", 18)
-    pdf.cell(0, 10, "This certifies that", align="C", ln=1)
+    
 
     pdf.set_font("Arial", "B", 26)
     pdf.cell(0, 15, name, align="C", ln=1)
@@ -101,12 +98,11 @@ def create_certificate(name, reg_no, subject):
     pdf.cell(0, 10, f"Reg. No: {reg_no}", align="C", ln=1)
     pdf.ln(5)
     pdf.multi_cell(0, 10,
-        f"has successfully completed the microlearning session on '{subject}' "
+        
         f"on {datetime.now().strftime('%d-%m-%Y')}.",
         align="C")
     pdf.ln(15)
-    pdf.set_font("Arial", "", 14)
-    pdf.cell(0, 10, "Authorized by: Course Coordinator", align="R")
+    
 
     filename = f"{reg_no}_{subject.replace(' ', '_')}.pdf"
     path = os.path.join(CERT_DIR, filename)
