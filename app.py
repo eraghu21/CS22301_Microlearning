@@ -26,7 +26,7 @@ except Exception as e:
 
 VIDEO_URL = st.secrets.get("video", {}).get("url", "https://www.youtube.com/watch?v=eLxQMPkDmAo")
 VIDEO_DURATION = int(st.secrets.get("video", {}).get("duration", 600))  # seconds
-SUBJECT = st.secrets.get("video", {}).get("subject", "CS22301 Microlearning")
+#SUBJECT = st.secrets.get("video", {}).get("subject", "CS22301")
 
 # =================== CERTIFICATE BACKGROUND (BASE64) ===================
 # Paste the full base64 string generated from Colab
